@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UAV Detection Results</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4cc9f0;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4bb543;
+            --warning-color: #fca311;
+            --danger-color: #e63946;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7fa;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2.2rem;
+        }
+
+        .result-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .result-image-container {
+            position: relative;
+            margin: 2rem 0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-image {
+            max-width: 100%;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .detection-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background-color: var(--light-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 0.5rem 0;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: #666;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.8rem 1.8rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            margin: 1rem 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn i {
+            margin-right: 8px;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .confidence-meter {
+            height: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+            margin-top: 1rem;
+            overflow: hidden;
+        }
+
+        .confidence-level {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success-color), var(--warning-color));
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        .detection-details {
+            margin: 2rem 0;
+            text-align: left;
+        }
+
+        .detection-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .detection-item:last-child {
+            border-bottom: none;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 1rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .download-options {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .detection-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .download-options {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-drone-alt"></i> UAV Detection Results ({{ model }})</h1>
+            <p>Analysis completed successfully</p>
+        </header>
+
+        <div class="result-container">
+            <div class="result-header">
+                <h2>Detection Analysis</h2>
+                <span class="timestamp">{{ timestamp }}</span>
+            </div>
+
+            <div class="result-image-container">
+                <img src="{{ url_for('static', filename=result_image) }}" alt="Detection Result" class="result-image">
+            </div>
+
+            <div class="detection-stats">
+                <div class="stat-card">
+                    <div class="stat-value">{{ uav_count }}</div>
+                    <div class="stat-label">UAVs Detected</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ avg_confidence }}%</div>
+                    <div class="stat-label">Average Confidence</div>
+                    <div class="confidence-meter">
+                        <div class="confidence-level" style="width: {{ avg_confidence }}%"></div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ processing_time }}s</div>
+                    <div class="stat-label">Processing Time</div>
+                </div>
+            </div>
+
+            {% if detections %}
+            <div class="detection-details">
+                <h3>Detailed Detection Results</h3>
+                {% for detection in detections %}
+                <div class="detection-item">
+                    <span>UAV {{ loop.index }} ({{ detection.class or detection.label }})</span>
+                    <span>Confidence: {{ detection.confidence }}%</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="download-options">
+                <a href="{{ url_for('download_result', format='jpg') }}" class="btn">
+                    <i class="fas fa-download"></i> Download as JPG
+                </a>
+                <a href="{{ url_for('download_result', format='png') }}" class="btn">
+                    <i class="fas fa-download"></i> Download as PNG
+                </a>
+                <a href="{{ url_for('download_data', format='json') }}" class="btn btn-secondary">
+                    <i class="fas fa-file-code"></i> Export JSON Data
+                </a>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a href="{{ url_for('index') }}" class="btn">
+                <i class="fas fa-upload"></i> Upload Another Image
+            </a>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2023 UAV Detection System | Powered by Furkan Bulut</p>
+    </footer>
+</body>
+</html>

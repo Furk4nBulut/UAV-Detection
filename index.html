@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UAV Detection System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4cc9f0;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4bb543;
+            --warning-color: #fca311;
+            --danger-color: #e63946;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7fa;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2.2rem;
+        }
+
+        .subtitle {
+            font-weight: 300;
+            opacity: 0.9;
+            margin-top: 0.5rem;
+        }
+
+        .upload-area {
+            background-color: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .upload-area:hover {
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .file-upload {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-upload:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .file-upload i {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .file-upload p {
+            margin: 0;
+            color: var(--dark-color);
+        }
+
+        .file-upload input {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+        }
+
+        .model-selection {
+            margin-top: 1.5rem;
+            width: 100%;
+            text-align: center;
+        }
+
+        .model-selection label {
+            font-weight: 600;
+            margin-right: 1rem;
+        }
+
+        .model-selection select {
+            padding: 0.5rem;
+            font-size: 1rem;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background-color: var(--light-color);
+            cursor: pointer;
+        }
+
+        .model-selection select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.8rem 1.8rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn i {
+            margin-right: 8px;
+        }
+
+        .result-area {
+            display: none;
+            background-color: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-top: 2rem;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .result-image {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .spinner {
+            border: 5px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 5px solid var(--primary-color);
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 1rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-drone-alt"></i> UAV Detection System</h1>
+            <p class="subtitle">Advanced drone detection technology</p>
+        </header>
+
+        <div class="upload-area">
+            <form id="detection-form" action="{{ url_for('upload_image') }}" method="post" enctype="multipart/form-data">
+                <div class="file-upload">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p><strong>Click to upload an image</strong></p>
+                    <p>or drag and drop</p>
+                    <p>PNG, JPG or JPEG (Max. 5MB)</p>
+                    <input type="file" name="image" id="image-input" accept="image/*" required>
+                </div>
+                <div class="model-selection">
+                    <label for="model">Select Model:</label>
+                    <select id="model" name="model" required>
+                        <option value="yolo">YOLO</option>
+                        <option value="cnn">CNN</option>
+                        <option value="efficientnet">EfficientNet</option>
+                        <option value="resnet">ResNet50</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn" id="detect-btn">
+                    <i class="fas fa-search"></i> Detect UAVs
+                </button>
+            </form>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Processing image and detecting UAVs...</p>
+        </div>
+
+        <div class="result-area" id="result-area">
+            <div class="result-header">
+                <h2>Preview</h2>
+            </div>
+            <div class="result-image-container">
+                <img src="" alt="Image Preview" class="result-image" id="result-image">
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2023 UAV Detection System | Powered by Furkan Bulut</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('detection-form');
+            const imageInput = document.getElementById('image-input');
+            const detectBtn = document.getElementById('detect-btn');
+            const loading = document.getElementById('loading');
+            const resultArea = document.getElementById('result-area');
+            const resultImage = document.getElementById('result-image');
+
+            // Preview selected image
+            imageInput.addEventListener('change', function(e) {
+                resultArea.style.display = 'block';
+                resultImage.src = '';
+                if (e.target.files.length > 0) {
+                    const file = e.target.files[0];
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        resultImage.src = event.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    resultArea.style.display = 'none';
+                }
+            });
+
+            // Form submission
+            form.addEventListener('submit', function(e) {
+                if (!imageInput.files || imageInput.files.length === 0) {
+                    e.preventDefault();
+                    alert('Please select an image first');
+                    return;
+                }
+                // Show loading state
+                detectBtn.disabled = true;
+                loading.style.display = 'block';
+                resultArea.style.display = 'none';
+            });
+
+            // Drag and drop functionality
+            const uploadArea = document.querySelector('.file-upload');
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = 'var(--primary-color)';
+                uploadArea.style.backgroundColor = 'rgba(67, 97, 238, 0.1)';
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.style.borderColor = '#ccc';
+                uploadArea.style.backgroundColor = 'transparent';
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#ccc';
+                uploadArea.style.backgroundColor = 'transparent';
+                if (e.dataTransfer.files.length) {
+                    imageInput.files = e.dataTransfer.files;
+                    // Trigger change event
+                    const event = new Event('change');
+                    imageInput.dispatchEvent(event);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
